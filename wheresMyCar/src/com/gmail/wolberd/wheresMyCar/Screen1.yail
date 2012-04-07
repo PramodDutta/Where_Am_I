@@ -1,0 +1,171 @@
+#|
+$Source $Yail
+|#
+
+(define-form com.gmail.wolberd.wheresMyCar.Screen1 Screen1)
+(require <com.google.youngandroid.runtime>)
+(def tempAddress "text")
+
+;;; Screen1
+(do-after-form-creation (set-and-coerce-property! Screen1 'Title "Droid, Where's My Car?" 'text)
+)
+(define-event Screen1 Initialize()
+ (set-var! tempAddress  (call-component-method 'TinyDB1 'GetValue (list "address")
+ '( text)
+)
+)
+
+(if (call-yail-primitive > (list (call-yail-primitive string-length (list (get-var tempAddress)
+)
+ '( text)
+ "length")
+ 0)
+ '( number number)
+ ">")
+ (begin (set-and-coerce-property! RememberedAddressDataLabel 'Text (get-var tempAddress)
+ 'text)
+
+(set-and-coerce-property! RememberedLatLabel 'Text (call-component-method 'TinyDB1 'GetValue (list "lat")
+ '( text)
+)
+ 'text)
+
+(set-and-coerce-property! RememberedLongLabel 'Text (call-component-method 'TinyDB1 'GetValue (list "long")
+ '( text)
+)
+ 'text)
+
+(set-and-coerce-property! DirectionsButton 'Enabled #t 'boolean)
+
+)
+)
+
+)
+;;; CurrentHeaderLabel
+(add-component Screen1 Label CurrentHeaderLabel (set-and-coerce-property! CurrentHeaderLabel 'FontBold #t 'boolean)
+(set-and-coerce-property! CurrentHeaderLabel 'FontSize 16.0 'number)
+(set-and-coerce-property! CurrentHeaderLabel 'Text "Your current location" 'text)
+(set-and-coerce-property! CurrentHeaderLabel 'Width 250 'number)
+)
+;;; HorizontalArrangement2
+(add-component Screen1 HorizontalArrangement HorizontalArrangement2 )
+;;; CurrentAddressLabel
+(add-component HorizontalArrangement2 Label CurrentAddressLabel (set-and-coerce-property! CurrentAddressLabel 'Text "Address:" 'text)
+)
+;;; CurrentAddressDataLabel
+(add-component HorizontalArrangement2 Label CurrentAddressDataLabel (set-and-coerce-property! CurrentAddressDataLabel 'Text "unknown" 'text)
+)
+;;; HorizontalArrangement1
+(add-component Screen1 HorizontalArrangement HorizontalArrangement1 )
+;;; GPSLabel
+(add-component HorizontalArrangement1 Label GPSLabel (set-and-coerce-property! GPSLabel 'Text "GPS:" 'text)
+)
+;;; CurrentLatLabel
+(add-component HorizontalArrangement1 Label CurrentLatLabel (set-and-coerce-property! CurrentLatLabel 'Text 0 'text)
+)
+;;; CommaLabel
+(add-component HorizontalArrangement1 Label CommaLabel (set-and-coerce-property! CommaLabel 'Text "," 'text)
+)
+;;; CurrentLongLabel
+(add-component HorizontalArrangement1 Label CurrentLongLabel (set-and-coerce-property! CurrentLongLabel 'Text 0 'text)
+)
+;;; RememberButton
+(add-component Screen1 Button RememberButton (set-and-coerce-property! RememberButton 'Enabled #f 'boolean)
+(set-and-coerce-property! RememberButton 'Text "Remember My Current Location" 'text)
+)
+(define-event RememberButton Click()
+ (set-and-coerce-property! RememberedAddressDataLabel 'Text (get-property LocationSensor1 CurrentAddress)
+ 'text)
+
+(set-and-coerce-property! RememberedLatLabel 'Text (get-property LocationSensor1 Latitude)
+ 'text)
+
+(set-and-coerce-property! RememberedLongLabel 'Text (get-property LocationSensor1 Longitude)
+ 'text)
+
+(call-component-method 'TinyDB1 'StoreValue (list "address" (get-property LocationSensor1 CurrentAddress)
+)
+ '( text any)
+)
+
+(call-component-method 'TinyDB1 'StoreValue (list "lat" (get-property LocationSensor1 Latitude)
+)
+ '( text any)
+)
+
+(call-component-method 'TinyDB1 'StoreValue (list "long" (get-property LocationSensor1 Longitude)
+)
+ '( text any)
+)
+
+(set-and-coerce-property! DirectionsButton 'Enabled #t 'boolean)
+
+)
+;;; RememberedHeaderLabel
+(add-component Screen1 Label RememberedHeaderLabel (set-and-coerce-property! RememberedHeaderLabel 'FontBold #t 'boolean)
+(set-and-coerce-property! RememberedHeaderLabel 'Text "Remembered Place" 'text)
+)
+;;; HorizontalArrangement3
+(add-component Screen1 HorizontalArrangement HorizontalArrangement3 )
+;;; RememberedAddressLabel
+(add-component HorizontalArrangement3 Label RememberedAddressLabel (set-and-coerce-property! RememberedAddressLabel 'Text "Adress:" 'text)
+)
+;;; RememberedAddressDataLabel
+(add-component HorizontalArrangement3 Label RememberedAddressDataLabel (set-and-coerce-property! RememberedAddressDataLabel 'Text "unknown" 'text)
+)
+;;; HorizontalArrangement4
+(add-component Screen1 HorizontalArrangement HorizontalArrangement4 )
+;;; RememberedGPSLabel
+(add-component HorizontalArrangement4 Label RememberedGPSLabel (set-and-coerce-property! RememberedGPSLabel 'Text "GPS:" 'text)
+)
+;;; RememberedLatLabel
+(add-component HorizontalArrangement4 Label RememberedLatLabel (set-and-coerce-property! RememberedLatLabel 'Text 0.0 'text)
+)
+;;; RememberedCommaLabel
+(add-component HorizontalArrangement4 Label RememberedCommaLabel (set-and-coerce-property! RememberedCommaLabel 'Text "," 'text)
+)
+;;; RememberedLongLabel
+(add-component HorizontalArrangement4 Label RememberedLongLabel (set-and-coerce-property! RememberedLongLabel 'Text 0.0 'text)
+)
+;;; DirectionsButton
+(add-component Screen1 Button DirectionsButton (set-and-coerce-property! DirectionsButton 'Enabled #f 'boolean)
+(set-and-coerce-property! DirectionsButton 'Text "Show Directions from current to remembered" 'text)
+)
+(define-event DirectionsButton Click()
+ (set-and-coerce-property! ActivityStarter1 'DataUri (call-yail-primitive string-append (list "http://maps.google.com/maps?saddr=" (get-property CurrentLatLabel Text)
+ "," (get-property CurrentLongLabel Text)
+ "&daddr=" (get-property RememberedLatLabel Text)
+ "," (get-property RememberedLongLabel Text)
+)
+ '( text text text text text text text text)
+ "make text")
+ 'text)
+
+(call-component-method 'ActivityStarter1 'StartActivity (list)
+ *no-coercion*)
+
+)
+;;; LocationSensor1
+(add-component Screen1 LocationSensor LocationSensor1 )
+(define-event LocationSensor1 LocationChanged( latitude  longitude  altitude )
+ (set-and-coerce-property! CurrentAddressDataLabel 'Text (get-property LocationSensor1 CurrentAddress)
+ 'text)
+
+(set-and-coerce-property! CurrentLatLabel 'Text (lexical-value latitude)
+ 'text)
+
+(set-and-coerce-property! CurrentLongLabel 'Text (lexical-value longitude)
+ 'text)
+
+(set-and-coerce-property! RememberButton 'Enabled #t 'boolean)
+
+)
+;;; TinyDB1
+(add-component Screen1 TinyDB TinyDB1 )
+;;; ActivityStarter1
+(add-component Screen1 ActivityStarter ActivityStarter1 (set-and-coerce-property! ActivityStarter1 'Action "android.intent.action.VIEW" 'text)
+(set-and-coerce-property! ActivityStarter1 'ActivityClass "com.google.android.maps.MapsActivity" 'text)
+(set-and-coerce-property! ActivityStarter1 'ActivityPackage "com.google.android.apps.maps" 'text)
+)
+(init-runtime  #f)
+
